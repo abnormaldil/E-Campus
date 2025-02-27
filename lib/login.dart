@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:lottie/lottie.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -8,200 +8,229 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final FocusNode _emailFocusNode = FocusNode(); 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false;
 
+  bool _obscurePassword = true;
 
-  bool _isLoading = false;
-  String? _errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Delay autofocus slightly to allow Flutter to finish rendering
-    Future.delayed(Duration(milliseconds: 300), () {
-      FocusScope.of(context).requestFocus(_emailFocusNode);
-    });
-  }
-
- 
-
-  Future<void> _login(String email, String password) async {
-    if (!_isLoading) {
+  Future<void> loginUser() async {
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        _isLoading = true;
-        _errorMessage = null;
+        isLoading = true;
       });
 
       try {
-        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: email.trim(),
-          password: password.trim(),
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
         );
-        Navigator.pushReplacementNamed(context, '/user',
-            arguments: userCredential.user);
+
+        // Navigate to Home Page (or any other page)
+        Navigator.popAndPushNamed(context, "/home");
       } on FirebaseAuthException catch (e) {
-        setState(() => _errorMessage = e.message);
+        String errorMessage = "Login failed. Please try again.";
+
+        if (e.code == "user-not-found") {
+          errorMessage = "No user found for this email.";
+        } else if (e.code == "wrong-password") {
+          errorMessage = "Incorrect password.";
+        } else if (e.code == "invalid-email") {
+          errorMessage = "Invalid email format.";
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("An error occurred. Try again."),
+            backgroundColor: Colors.red,
+          ),
+        );
       } finally {
-        setState(() => _isLoading = false);
+        setState(() {
+          isLoading = false;
+        });
       }
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        toolbarHeight: 60,
+        toolbarHeight: 80,
         backgroundColor: Colors.transparent,
-        elevation: 1,
-        title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-          SizedBox(width: 175),
-          Text(
-            "Login",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Gilroy',
-              color: Colors.white,
-            ),
+        elevation: 0,
+        title: Text(
+          "Welcome Back!",
+          style: TextStyle(
+            fontFamily: 'Gilroy',
+            fontSize: 36,
+            fontWeight: FontWeight.w900,
+            color: Colors.black,
           ),
-        ]),
+        ),
       ),
-      body: Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 30),
+            child: Form(
+              key: _formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Email Field with Autofocus
-                        TextFormField(
-                          controller: _emailController,
-                          focusNode: _emailFocusNode,
-                          style: TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            labelStyle: TextStyle(color: Colors.white),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (value) =>
-                              value != null && value.contains('@')
-                                  ? null
-                                  : 'Enter a valid email',
-                        ),
-                        SizedBox(height: 16),
-
-                        // Password Field
-                        TextFormField(
-                          controller: _passwordController,
-                          style: TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            labelStyle: TextStyle(color: Colors.white),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                          ),
-                          obscureText: true,
-                          validator: (value) =>
-                              value != null && value.length >= 6
-                                  ? null
-                                  : 'Password must be at least 6 characters',
-                        ),
-                        SizedBox(height: 14),
-
-                        // Error Message Display
-                        if (_errorMessage != null)
-                          Text(
-                            _errorMessage!,
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        SizedBox(height: 14),
-
-                        // Login Button with Gradient & Rounded Corners
-                        _isLoading
-                            ? Center(
-                                child: CircularProgressIndicator(
-                                    color: Colors.white))
-                            : GestureDetector(
-                                onTap: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    _login(_emailController.text,
-                                        _passwordController.text);
-                                  }
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 16),
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Color.fromARGB(255, 37, 232, 154),
-                                        Color.fromARGB(255, 42, 254, 169),
-                                        Color.fromARGB(255, 29, 213, 140),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color:
-                                            Colors.blueAccent.withOpacity(0.3),
-                                        blurRadius: 10,
-                                        offset: Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    'Login',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                      ],
+                  Center(
+                    child: Lottie.asset(
+                      'assets/earth.json', // Lottie animation file
+                      height: 220, // Adjusted height to fit properly
+                      width: 220,
+                      fit: BoxFit.contain,
                     ),
                   ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    controller: emailController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      } else if (!value.endsWith("@rit.ac.in")) {
+                        return 'Use your @rit.ac.in email';
+                      }
+                      return null;
+                    },
+                    style: TextStyle(fontFamily: 'Gilroy', fontSize: 18),
+                    decoration: InputDecoration(
+                      hintText: "Email",
+                      hintStyle: TextStyle(fontFamily: 'Gilroy'),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(
+                            color: const Color.fromARGB(255, 0, 0, 0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50),
+                        borderSide: BorderSide(
+                            color: const Color.fromARGB(255, 0, 0, 0)),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
+                  // Password Field
+                  TextFormField(
+                    controller: passwordController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                    obscureText:
+                        _obscurePassword, // Use the state variable here
+                    style: TextStyle(fontFamily: 'Gilroy', fontSize: 18),
+                    decoration: InputDecoration(
+                      hintText: "Password",
+                      hintStyle: TextStyle(fontFamily: 'Gilroy'),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(
+                            color: const Color.fromARGB(255, 0, 0, 0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50),
+                        borderSide: BorderSide(
+                            color: const Color.fromARGB(255, 0, 0, 0)),
+                      ),
+                      // Add the suffix icon for password visibility toggle
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          // Change the icon based on the state
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          // Toggle the state when pressed
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+
+                  // Login Button
+                  GestureDetector(
+                    onTap: isLoading ? null : loginUser,
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color.fromARGB(255, 37, 232, 154),
+                            Color.fromARGB(255, 42, 254, 169),
+                            Color.fromARGB(255, 29, 213, 140),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Center(
+                        child: isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                                "Log In",
+                                style: TextStyle(
+                                  fontFamily: 'Gilroy',
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+
+                  // Sign Up & Forgot Password
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.popAndPushNamed(context, '/register');
+                        },
+                        child: Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontFamily: 'Gilroy',
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
           ),
-          Expanded(flex: 1, child: Container()), // Empty right-side space
-        ],
+        ),
       ),
     );
   }
