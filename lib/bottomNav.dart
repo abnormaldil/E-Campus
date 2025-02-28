@@ -1,3 +1,4 @@
+import 'package:ecampus/plastic.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:ecampus/home.dart';
@@ -18,6 +19,7 @@ class _BottomNavState extends State<BottomNav> {
   late HomePage homePage;
   late LendingPage lendingPage;
   late BookingScreen requestPage;
+  late PlasticDetectionPage plasticpage;
 
   @override
   void initState() {
@@ -25,8 +27,9 @@ class _BottomNavState extends State<BottomNav> {
     homePage = HomePage();
     lendingPage = LendingPage();
     requestPage = BookingScreen();
+    plasticpage = PlasticDetectionPage();
 
-    pages = [lendingPage, homePage, requestPage];
+    pages = [lendingPage, homePage, requestPage, plasticpage];
     currentTabIndex = 1;
   }
 
@@ -34,19 +37,15 @@ class _BottomNavState extends State<BottomNav> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Render the current page as the background
         Positioned.fill(
           child: pages[currentTabIndex],
         ),
-
-        // Place the navigation bar on top of the pages
         Align(
           alignment: Alignment.bottomCenter,
           child: CurvedNavigationBar(
             height: 75,
-            backgroundColor: Colors.transparent, // Transparent navbar
-            color:
-                const Color.fromARGB(255, 51, 50, 50), // Navbar's primary color
+            backgroundColor: Colors.transparent,
+            color: const Color.fromARGB(255, 51, 50, 50),
             animationDuration: Duration(milliseconds: 500),
             index: currentTabIndex,
             onTap: (int index) {
@@ -58,19 +57,25 @@ class _BottomNavState extends State<BottomNav> {
               Icon(
                 Icons.shopping_cart,
                 color: currentTabIndex == 0
-                    ? Colors.white // Active color
+                    ? Colors.white
                     : Color.fromARGB(255, 42, 254, 169),
               ),
               Icon(
                 Icons.home_rounded,
                 color: currentTabIndex == 1
-                    ? Colors.white // Active color
+                    ? Colors.white
                     : Color.fromARGB(255, 42, 254, 169),
               ),
               Icon(
                 Icons.calendar_month_outlined,
                 color: currentTabIndex == 2
-                    ? Colors.white // Active color
+                    ? Colors.white
+                    : Color.fromARGB(255, 42, 254, 169),
+              ),
+              Icon(
+                Icons.recycling,
+                color: currentTabIndex == 3
+                    ? Colors.white
                     : Color.fromARGB(255, 42, 254, 169),
               ),
             ],

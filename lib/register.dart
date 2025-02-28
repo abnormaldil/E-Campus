@@ -40,7 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       String name = nameController.text.trim();
 
       try {
-        // Register user in Firebase Authentication
+        
         UserCredential userCredential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
@@ -49,10 +49,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         String userId = userCredential.user!.uid;
 
-        // Save user data to Firestore
+        
         await FirebaseFirestore.instance.collection("students").doc(userId).set({
           "name": name,
-          "department": selectedDepartment, // Store only selected department
+          "department": selectedDepartment, 
           "email": email,
         });
 
@@ -60,7 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           SnackBar(content: Text("Registration Successful!")),
         );
 
-        // Navigate to login screen
+        
         Navigator.popAndPushNamed(context, "/login");
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(

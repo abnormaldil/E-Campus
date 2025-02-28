@@ -1,14 +1,13 @@
-import 'package:ecampus/lending.dart';
 import 'package:ecampus/login.dart';
+
 import 'package:ecampus/register.dart';
-import 'package:ecampus/route.dart';
+import 'package:ecampus/request.dart';
+
+import 'package:ecampus/splash.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:ecampus/home.dart';
-import 'package:ecampus/splash.dart';
-import 'package:ecampus/temporary.dart';
 
+import 'package:ecampus/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,8 +21,6 @@ void main() async {
     ),
   );
 
-
-
   runApp(MyApp());
 }
 
@@ -32,13 +29,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainPage(),
+      home: SplashScreen(),
       routes: {
-        // '/register': (context) => RegisterPage(),
         '/home': (context) => HomePage(),
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterScreen(),
-
       },
     );
   }

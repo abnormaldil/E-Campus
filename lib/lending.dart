@@ -34,13 +34,13 @@ class _LendingPageState extends State<LendingPage> {
             style: TextStyle(
               fontSize: 30,
               color: Colors
-                  .white, // Changed text color to white for better contrast
+                  .white, 
               fontFamily: 'Gilroy',
             ),
           ),
         ),
         backgroundColor:
-            Color.fromARGB(255, 37, 232, 154), // Set background color to green
+            Color.fromARGB(255, 37, 232, 154), 
       ),
       body: Column(
         children: [
@@ -56,10 +56,10 @@ class _LendingPageState extends State<LendingPage> {
                       fontFamily: 'Gilroy',
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30), // Rounded border
+                      borderRadius: BorderRadius.circular(30), 
                       borderSide: BorderSide(
                           color: const Color.fromARGB(255, 0, 0, 0),
-                          width: 0.3), // Border style
+                          width: 0.3), 
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -71,7 +71,7 @@ class _LendingPageState extends State<LendingPage> {
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide(
                           color: const Color.fromARGB(255, 0, 0, 0),
-                          width: 0.3), // Highlight when focused
+                          width: 0.3), 
                     ),
                     prefixIcon: Icon(Icons.search,
                         color: const Color.fromARGB(255, 0, 0, 0)),
@@ -181,15 +181,15 @@ class _LendingPageState extends State<LendingPage> {
                 Center(
                   child: Row(
                     mainAxisSize:
-                        MainAxisSize.min, // Ensures it takes minimal space
+                        MainAxisSize.min, 
                     mainAxisAlignment: MainAxisAlignment
-                        .center, // Center align the row content
+                        .center, 
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white, // Set background color to white
+                          color: Colors.white, 
                           borderRadius: BorderRadius.circular(
-                              30), // Optional: Add rounded corners
+                              30), 
                         ),
                         child: DropdownButton<String>(
                           value: sortBy,
@@ -212,20 +212,20 @@ class _LendingPageState extends State<LendingPage> {
                             );
                           }).toList(),
                           dropdownColor: Colors
-                              .white, // Set dropdown menu background color to white
+                              .white, 
                           icon: Icon(Icons.arrow_drop_down,
-                              color: Colors.black), // Customize dropdown icon
+                              color: Colors.black), 
                           style: TextStyle(
-                            color: Colors.black, // Set text color
+                            color: Colors.black, 
                             fontFamily: 'Gilroy',
                           ),
                           underline:
-                              Container(), // Remove the default underline
+                              Container(), 
                         ),
                       ),
                       SizedBox(
                           width:
-                              75), // Adds spacing between dropdown and checkbox
+                              75), 
                       Row(
                         children: [
                           Checkbox(
@@ -273,7 +273,7 @@ class _LendingPageState extends State<LendingPage> {
                         selectedDepartments.contains("All") ||
                         selectedDepartments.contains(doc['Department']);
                     bool matchesAvailability = !showOnlyAvailable ||
-                        doc['Availability'] != 'lent'; // 🔹 Updated
+                        doc['Availability'] != 'lent'; 
                     return matchesSearch &&
                         matchesDepartment &&
                         matchesAvailability;
@@ -296,13 +296,13 @@ class _LendingPageState extends State<LendingPage> {
                       String currentUserId =
                           FirebaseAuth.instance.currentUser?.uid ?? '';
                       String allotUserId =
-                          doc['allot'] ?? ''; // The user who got it
+                          doc['allot'] ?? ''; 
                       bool isCurrentUser = doc['Availability'] == currentUserId;
                       bool isPending = isCurrentUser && doc['flag'] == 0;
                       bool isApproved = isCurrentUser && doc['flag'] == 1;
                       bool isLent = doc['Availability'] == 'lent';
 
-                      // 🔹 If approved, update "allot" field to currentUserId
+                      
                       if (isApproved && doc['allot'] != currentUserId) {
                         FirebaseFirestore.instance
                             .collection('hardwares')
@@ -311,9 +311,9 @@ class _LendingPageState extends State<LendingPage> {
                                 (error) => print("Failed to update: $error"));
                       }
 
-                      // 🔹 If the current user is allotted, show "Approved" badge
+                      
                       bool showApprovedBadge = allotUserId == currentUserId;
-                      // 🔹 If the current user is NOT allotted, show "Unavailable" badge
+                      
                       bool showUnavailableBadge =
                           allotUserId != currentUserId && isLent;
 
@@ -322,21 +322,21 @@ class _LendingPageState extends State<LendingPage> {
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius:
-                                BorderRadius.circular(30), // Curved border
+                                BorderRadius.circular(30), 
                             border: Border.all(
-                              color: Colors.grey, // Border color
-                              width: 0.3, // Border width
+                              color: Colors.grey, 
+                              width: 0.3, 
                             ),
                             color: isLent ? Colors.grey[300] : Colors.white,
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black
-                                    .withOpacity(0.1), // Shadow color
-                                blurRadius: 2, // Blur radius
-                                spreadRadius: 1, // Spread radius
-                                offset: Offset(0, 0), // Shadow offset (x, y)
+                                    .withOpacity(0.1), 
+                                blurRadius: 2, 
+                                spreadRadius: 1, 
+                                offset: Offset(0, 0), 
                               ),
-                            ], // Background color
+                            ], 
                           ),
                           child: Stack(
                             children: [
@@ -346,7 +346,7 @@ class _LendingPageState extends State<LendingPage> {
                                   Expanded(
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(
-                                          30), // Adds rounded corners
+                                          30), 
                                       child: ColorFiltered(
                                         colorFilter: isLent
                                             ? ColorFilter.mode(Colors.grey,
@@ -382,7 +382,7 @@ class _LendingPageState extends State<LendingPage> {
                                               ? 1.0
                                               : (isPending
                                                   ? 0.5
-                                                  : 0.0), // Progress value
+                                                  : 0.0), 
                                           backgroundColor: Colors.grey[300],
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
@@ -427,11 +427,11 @@ class _LendingPageState extends State<LendingPage> {
                                         shadows: [
                                           Shadow(
                                             offset:
-                                                Offset(0, 0), // Shadow position
+                                                Offset(0, 0), 
                                             blurRadius:
-                                                25, // Shadow blur effect
+                                                25, 
                                             color: Colors.black.withOpacity(
-                                                0.7), // Shadow color
+                                                0.7), 
                                           ),
                                         ],
                                         fontWeight: FontWeight.bold,
@@ -453,11 +453,11 @@ class _LendingPageState extends State<LendingPage> {
                                         shadows: [
                                           Shadow(
                                             offset:
-                                                Offset(0, 0), // Shadow position
+                                                Offset(0, 0), 
                                             blurRadius:
-                                                25, // Shadow blur effect
+                                                25, 
                                             color: Colors.black.withOpacity(
-                                                0.7), // Shadow color
+                                                0.7), 
                                           ),
                                         ],
                                         fontWeight: FontWeight.bold,
@@ -488,7 +488,7 @@ void _showDetailsDialog(BuildContext context, QueryDocumentSnapshot doc) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        backgroundColor: Colors.white, // Set background color to white
+        backgroundColor: Colors.white, 
         title: Center(
           child: Text(
             doc['Title'],
@@ -505,21 +505,21 @@ void _showDetailsDialog(BuildContext context, QueryDocumentSnapshot doc) {
           children: [
             Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20), // Curved border
+                borderRadius: BorderRadius.circular(20), 
                 border: Border.all(
-                  color: const Color.fromARGB(0, 0, 0, 0), // Black border color
-                  width: 0.3, // Border width
+                  color: const Color.fromARGB(0, 0, 0, 0), 
+                  width: 0.3, 
                 ),
                 color: const Color.fromARGB(255, 255, 255, 255),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black
-                        .withOpacity(0.1), // Shadow color with opacity
-                    blurRadius: 15, // Blur radius
-                    spreadRadius: 5, // Spread radius
-                    offset: Offset(0, 0), // Shadow offset (x, y)
+                        .withOpacity(0.1), 
+                    blurRadius: 15, 
+                    spreadRadius: 5, 
+                    offset: Offset(0, 0), 
                   ),
-                ], // Transparent background
+                ], 
               ),
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Text(
@@ -532,26 +532,26 @@ void _showDetailsDialog(BuildContext context, QueryDocumentSnapshot doc) {
               ),
             ),
             SizedBox(height: 40),
-            // Year and Department in a single row
+            
             Center(
               child: Row(
                 mainAxisSize:
-                    MainAxisSize.min, // Ensures it takes minimal space
+                    MainAxisSize.min, 
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Year inside a curved rectangle border
+                  
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15), // Curved border
+                      borderRadius: BorderRadius.circular(15), 
                       border: Border.all(
-                        color: Colors.black, // Black border color
-                        width: 0.3, // Border width
+                        color: Colors.black, 
+                        width: 0.3, 
                       ),
-                      color: Colors.transparent, // Transparent background
+                      color: Colors.transparent, 
                     ),
                     padding: EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 8), // Padding inside the container
+                        vertical: 8), 
                     child: Text(
                       "Year of Contribution: ${doc['Year']}",
                       style: TextStyle(
@@ -561,20 +561,20 @@ void _showDetailsDialog(BuildContext context, QueryDocumentSnapshot doc) {
                       ),
                     ),
                   ),
-                  SizedBox(width: 15), // Spacing between Year and Department
-                  // Department inside a curved rectangle border
+                  SizedBox(width: 15), 
+                  
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15), // Curved border
+                      borderRadius: BorderRadius.circular(15), 
                       border: Border.all(
-                        color: Colors.black, // Black border color
-                        width: 0.3, // Border width
+                        color: Colors.black, 
+                        width: 0.3, 
                       ),
-                      color: Colors.transparent, // Transparent background
+                      color: Colors.transparent, 
                     ),
                     padding: EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 8), // Padding inside the container
+                        vertical: 8), 
                     child: Text(
                       "${doc['Department']}",
                       style: TextStyle(
@@ -603,7 +603,7 @@ void _showDetailsDialog(BuildContext context, QueryDocumentSnapshot doc) {
           ),
           if (isLent)
             ElevatedButton(
-              onPressed: null, // Disables the button
+              onPressed: null, 
               child: Text(
                 "Unavailable",
                 style: TextStyle(
@@ -619,29 +619,29 @@ void _showDetailsDialog(BuildContext context, QueryDocumentSnapshot doc) {
           else
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context); // Close the current dialog
+                Navigator.pop(context); 
                 _showRequestFormDialog(
-                    context, doc); // Open the request form dialog
+                    context, doc); 
               },
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero, // Remove default padding
+                padding: EdgeInsets.zero, 
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20), // Rounded corners
+                  borderRadius: BorderRadius.circular(20), 
                 ),
-                elevation: 0, // Remove default elevation
-                shadowColor: Colors.transparent, // Remove shadow
+                elevation: 0, 
+                shadowColor: Colors.transparent, 
               ),
               child: Ink(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color.fromARGB(255, 37, 232, 154), // Start color
-                      Color.fromARGB(255, 42, 254, 169), // End color
+                      Color.fromARGB(255, 37, 232, 154), 
+                      Color.fromARGB(255, 42, 254, 169), 
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(20), // Rounded corners
+                  borderRadius: BorderRadius.circular(20), 
                 ),
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -651,7 +651,7 @@ void _showDetailsDialog(BuildContext context, QueryDocumentSnapshot doc) {
                       fontFamily: 'Gilroy',
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white, // Text color
+                      color: Colors.white, 
                     ),
                   ),
                 ),
@@ -692,13 +692,13 @@ void _showRequestFormDialog(BuildContext context, QueryDocumentSnapshot doc) {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Project Name Field
+                  
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30), // Curved border
+                      borderRadius: BorderRadius.circular(30), 
                       border: Border.all(
-                        color: Colors.grey, // Border color
-                        width: 0.3, // Border width
+                        color: Colors.grey, 
+                        width: 0.3, 
                       ),
                     ),
                     child: TextFormField(
@@ -725,13 +725,13 @@ void _showRequestFormDialog(BuildContext context, QueryDocumentSnapshot doc) {
                     ),
                   ),
                   SizedBox(height: 20),
-                  // Project Abstract Field
+                  
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30), // Curved border
+                      borderRadius: BorderRadius.circular(30), 
                       border: Border.all(
-                        color: Colors.grey, // Border color
-                        width: 0.3, // Border width
+                        color: Colors.grey, 
+                        width: 0.3, 
                       ),
                     ),
                     constraints: BoxConstraints(minHeight: 150),
@@ -782,7 +782,7 @@ void _showRequestFormDialog(BuildContext context, QueryDocumentSnapshot doc) {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
 
-                // Retrieve the current logged-in user's details
+                
                 final user = FirebaseAuth.instance.currentUser;
                 if (user != null) {
                   final studentDoc = await FirebaseFirestore.instance
@@ -795,7 +795,7 @@ void _showRequestFormDialog(BuildContext context, QueryDocumentSnapshot doc) {
                     final studentDepartment = studentDoc['department'];
                     final hardwareTitle = doc['Title'];
 
-                    // Save the request to Firestore
+                    
                     await FirebaseFirestore.instance
                         .collection('requests')
                         .add({
@@ -807,7 +807,7 @@ void _showRequestFormDialog(BuildContext context, QueryDocumentSnapshot doc) {
                       'requestDate': DateTime.now(),
                     });
 
-                    // Find the document in 'hardwares' collection that matches the hardware title
+                    
                     final hardwareQuery = await FirebaseFirestore.instance
                         .collection('hardwares')
                         .where('Title', isEqualTo: hardwareTitle)
@@ -816,13 +816,13 @@ void _showRequestFormDialog(BuildContext context, QueryDocumentSnapshot doc) {
                     if (hardwareQuery.docs.isNotEmpty) {
                       final hardwareDoc = hardwareQuery.docs.first;
 
-                      // Update the 'Availability' field with the logged-in user ID
+                      
                       await FirebaseFirestore.instance
                           .collection('hardwares')
                           .doc(hardwareDoc.id)
                           .update({'Availability': user.uid});
 
-                      // Close the dialog and show success message
+                      
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:ecampus/route.dart';
+import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
   _SplashState createState() => _SplashState();

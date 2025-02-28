@@ -13,7 +13,7 @@ class _BookingScreenState extends State<BookingScreen> {
   late DateTime _focusedDay;
   DateTime? _selectedDay;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final List<String> _timeSlots = ['9-12', '12-4'];
+  final List<String> _timeSlots = ['9-12', '12-4']; // Updated time slots
   String? _selectedVenue;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   final List<String> _venues = [
@@ -257,7 +257,7 @@ class _BookingScreenState extends State<BookingScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             padding:
-                const EdgeInsets.symmetric(vertical: 16), // Reduced padding
+                const EdgeInsets.symmetric(vertical: 12), // Reduced padding
           ),
           onPressed: isBooked ? null : () => _bookSlot(slot),
           child: Column(
@@ -265,14 +265,14 @@ class _BookingScreenState extends State<BookingScreen> {
             children: [
               Text(slot,
                   style: const TextStyle(
-                      fontSize: 16, // Smaller text
+                      fontSize: 13, // Smaller text
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4), // Reduced spacing
+              const SizedBox(height: 1), // Reduced spacing
               Text(
                 isBooked ? 'Booked' : 'Available',
                 style: TextStyle(
-                  fontSize: 12, // Smaller text
+                  fontSize: 14, // Smaller text
                   color: isBooked ? Colors.red[100] : Colors.green[50],
                 ),
               ),
@@ -310,6 +310,12 @@ class _BookingScreenState extends State<BookingScreen> {
             });
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: () => FirebaseAuth.instance.signOut(),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -449,7 +455,7 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 120.0),
             child: Container(
               width: double.infinity,
               height: 56,

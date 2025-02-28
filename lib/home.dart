@@ -11,15 +11,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String userName = "Loading..."; // Default value while fetching name
+  String userName = "Loading...";
 
   @override
   void initState() {
     super.initState();
-    fetchUserName(); // Fetch the user's name when the widget is initialized
+    fetchUserName();
   }
 
-  // Fetch the user's name from Firestore
   Future<void> fetchUserName() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -31,17 +30,17 @@ class _HomePageState extends State<HomePage> {
 
         if (userDoc.exists) {
           setState(() {
-            userName = userDoc['name'] ?? "User"; // Update the name
+            userName = userDoc['name'] ?? "User";
           });
         } else {
           setState(() {
-            userName = "User"; // Fallback if name is not found
+            userName = "User";
           });
         }
       }
     } catch (e) {
       setState(() {
-        userName = "User"; // Fallback in case of error
+        userName = "User";
       });
       print("Error fetching user name: $e");
     }
@@ -89,8 +88,7 @@ class _HomePageState extends State<HomePage> {
                           const SnackBar(
                               content: Text('Logged out successfully!')),
                         );
-                        Navigator.pushReplacementNamed(
-                            context, '/login'); // Redirect to Login Page
+                        Navigator.pushReplacementNamed(context, '/login');
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Logout failed: $e')),
@@ -99,15 +97,13 @@ class _HomePageState extends State<HomePage> {
                     },
                     icon: const Icon(
                       Icons.logout,
-                      size: 38, // Small icon size
-                      color: Colors.black, // Default color (change if needed)
+                      size: 38,
+                      color: Colors.black,
                     ),
                   ),
                 ],
               ),
-
               const SizedBox(height: 30),
-
               Center(
                 child: const Text(
                   'Access your campus features quickly',
@@ -117,51 +113,28 @@ class _HomePageState extends State<HomePage> {
                       fontFamily: 'Gilroy'),
                 ),
               ),
-
               const SizedBox(height: 40),
-
-              // Feature buttons
               FeatureButton(
                 icon: Icons.calendar_today,
                 title: 'Calendar',
-                description: 'View and manage your academic schedule',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LendingPage()),
-                  );
-                },
+                description:
+                    'View and manage your academic schedule and request rooms',
               ),
-
               const SizedBox(height: 20),
-
               FeatureButton(
                 icon: Icons.assignment_outlined,
-                title: 'Easy Request',
-                description: 'Submit and track your campus requests',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LendingPage()),
-                  );
-                },
+                title: 'Project Help',
+                description: 'Lend project components',
               ),
               const SizedBox(height: 20),
-
               FeatureButton(
                 icon: Icons.account_balance_wallet,
                 title: 'Pocket Money',
-                description: 'Manage your campus wallet and expenses',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Opening Pocket Money...')),
-                  );
-                },
+                description:
+                    'Manage your campus wallet and expenses through proper disposal of plastic',
+                //
               ),
-
               const Spacer(),
-
-              // Interactive message at bottom
               Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
@@ -221,94 +194,87 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// FeatureButton Component (Now accepts onTap)
 class FeatureButton extends StatelessWidget {
   final IconData icon;
   final String title;
   final String description;
-  final VoidCallback onTap; // Accepts an onTap function
 
   const FeatureButton({
     Key? key,
     required this.icon,
     required this.title,
     required this.description,
-    required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap, // Executes the function when tapped
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 37, 232, 154),
-                    Color.fromARGB(255, 42, 254, 169),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: Color(0xFF333333),
-                        fontFamily: 'Gilroy'),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    description,
-                    style: const TextStyle(
-                        color: Color(0xFF777777),
-                        fontSize: 14,
-                        fontFamily: 'Gilroy'),
-                  ),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 37, 232, 154),
+                  Color.fromARGB(255, 42, 254, 169),
                 ],
               ),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Color(0xFFCCCCCC),
-              size: 16,
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 24,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Color(0xFF333333),
+                      fontFamily: 'Gilroy'),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  description,
+                  style: const TextStyle(
+                      color: Color(0xFF777777),
+                      fontSize: 14,
+                      fontFamily: 'Gilroy'),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: Color(0xFFCCCCCC),
+            size: 16,
+          ),
+        ],
       ),
     );
   }
 }
 
-// GradientButton Component
 class GradientButton extends StatelessWidget {
   final Widget child;
   final VoidCallback onPressed;

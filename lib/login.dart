@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
           password: passwordController.text.trim(),
         );
 
-        // Navigate to Home Page (or any other page)
+        
         Navigator.popAndPushNamed(context, "/home");
       } on FirebaseAuthException catch (e) {
         String errorMessage = "Login failed. Please try again.";
@@ -90,8 +90,8 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Center(
                     child: Lottie.asset(
-                      'assets/earth.json', // Lottie animation file
-                      height: 220, // Adjusted height to fit properly
+                      'assets/earth.json', 
+                      height: 220, 
                       width: 220,
                       fit: BoxFit.contain,
                     ),
@@ -127,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   SizedBox(height: 20),
 
-                  // Password Field
+                  
                   TextFormField(
                     controller: passwordController,
                     validator: (value) {
@@ -137,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                       return null;
                     },
                     obscureText:
-                        _obscurePassword, // Use the state variable here
+                        _obscurePassword, 
                     style: TextStyle(fontFamily: 'Gilroy', fontSize: 18),
                     decoration: InputDecoration(
                       hintText: "Password",
@@ -152,17 +152,17 @@ class _LoginPageState extends State<LoginPage> {
                         borderSide: BorderSide(
                             color: const Color.fromARGB(255, 0, 0, 0)),
                       ),
-                      // Add the suffix icon for password visibility toggle
+                      
                       suffixIcon: IconButton(
                         icon: Icon(
-                          // Change the icon based on the state
+                          
                           _obscurePassword
                               ? Icons.visibility_off
                               : Icons.visibility,
                           color: Colors.grey,
                         ),
                         onPressed: () {
-                          // Toggle the state when pressed
+                          
                           setState(() {
                             _obscurePassword = !_obscurePassword;
                           });
@@ -172,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   SizedBox(height: 30),
 
-                  // Login Button
+                  
                   GestureDetector(
                     onTap: isLoading ? null : loginUser,
                     child: Container(
@@ -207,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   SizedBox(height: 30),
 
-                  // Sign Up & Forgot Password
+                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
