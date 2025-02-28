@@ -1,3 +1,4 @@
+import 'package:ecampus/bottomNav.dart';
 import 'package:ecampus/login.dart';
 
 import 'package:ecampus/register.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => HomePage(),
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterScreen(),
+        '/bottomnav': (context) => BottomNav(),
       },
     );
   }

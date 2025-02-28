@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
         );
 
         
-        Navigator.popAndPushNamed(context, "/home");
+        Navigator.popAndPushNamed(context, "/bottomnav");
       } on FirebaseAuthException catch (e) {
         String errorMessage = "Login failed. Please try again.";
 
