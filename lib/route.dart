@@ -1,3 +1,4 @@
+import 'package:ecampus/bottomNav.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ecampus/home.dart';
@@ -13,7 +14,7 @@ class MainPage extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return HomePage();
+            return BottomNav();
           } else {
             return LoginPage();
           }

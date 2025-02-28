@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class LendingPage extends StatefulWidget {
   @override
@@ -27,8 +28,19 @@ class _LendingPageState extends State<LendingPage> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        title: Text("Lending"),
-        backgroundColor: const Color.fromARGB(0, 255, 255, 255),
+        title: Center(
+          child: Text(
+            "Help With Your Project!",
+            style: TextStyle(
+              fontSize: 30,
+              color: Colors
+                  .white, // Changed text color to white for better contrast
+              fontFamily: 'Gilroy',
+            ),
+          ),
+        ),
+        backgroundColor:
+            Color.fromARGB(255, 37, 232, 154), // Set background color to green
       ),
       body: Column(
         children: [
@@ -241,179 +253,226 @@ class _LendingPageState extends State<LendingPage> {
             ),
           ),
           Expanded(
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('hardwares')
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 74),
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('hardwares')
+                    .snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(child: CircularProgressIndicator());
+                  }
 
-                var docs = snapshot.data!.docs.where((doc) {
-                  bool matchesSearch = doc['Title']
-                      .toString()
-                      .toLowerCase()
-                      .contains(searchQuery);
-                  bool matchesDepartment = selectedDepartments.isEmpty ||
-                      selectedDepartments.contains("All") ||
-                      selectedDepartments.contains(doc['Department']);
-                  bool matchesAvailability =
-                      !showOnlyAvailable || doc['Availability'] != 'lent';
-                  return matchesSearch &&
-                      matchesDepartment &&
-                      matchesAvailability;
-                }).toList();
+                  var docs = snapshot.data!.docs.where((doc) {
+                    bool matchesSearch = doc['Title']
+                        .toString()
+                        .toLowerCase()
+                        .contains(searchQuery);
+                    bool matchesDepartment = selectedDepartments.isEmpty ||
+                        selectedDepartments.contains("All") ||
+                        selectedDepartments.contains(doc['Department']);
+                    bool matchesAvailability = !showOnlyAvailable ||
+                        doc['Availability'] != 'lent'; // 🔹 Updated
+                    return matchesSearch &&
+                        matchesDepartment &&
+                        matchesAvailability;
+                  }).toList();
 
-                docs.sort((a, b) =>
-                    a[sortBy].toString().compareTo(b[sortBy].toString()));
+                  docs.sort((a, b) =>
+                      a[sortBy].toString().compareTo(b[sortBy].toString()));
 
-                return GridView.builder(
-                  padding: EdgeInsets.all(8.0),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10.0,
-                    mainAxisSpacing: 10.0,
-                    childAspectRatio: 0.6,
-                  ),
-                  itemCount: docs.length,
-                  itemBuilder: (context, index) {
-                    var doc = docs[index];
-                    bool isLent = doc['Availability'] == 'lent';
-                    String imagePath =
-                        hardwareImages[doc['Title']] ?? "assets/default.png";
-                    String currentUserId =
-                        FirebaseAuth.instance.currentUser?.uid ?? '';
-                    bool isCurrentUser = doc['Availability'] == currentUserId;
-                    bool isApproved = isCurrentUser && doc['flag'] == 1;
+                  return GridView.builder(
+                    padding: EdgeInsets.all(8.0),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10.0,
+                      mainAxisSpacing: 10.0,
+                      childAspectRatio: 0.6,
+                    ),
+                    itemCount: docs.length,
+                    itemBuilder: (context, index) {
+                      var doc = docs[index];
+                      String currentUserId =
+                          FirebaseAuth.instance.currentUser?.uid ?? '';
+                      String allotUserId =
+                          doc['allot'] ?? ''; // The user who got it
+                      bool isCurrentUser = doc['Availability'] == currentUserId;
+                      bool isPending = isCurrentUser && doc['flag'] == 0;
+                      bool isApproved = isCurrentUser && doc['flag'] == 1;
+                      bool isLent = doc['Availability'] == 'lent';
 
-                    // Update Firestore when approved
-                    if (isApproved && doc['Availability'] != 'lent') {
-                      FirebaseFirestore.instance
-                          .collection('hardwares')
-                          .doc(doc.id)
-                          .update({"Availability": "lent"}).catchError(
-                              (error) => print("Failed to update: $error"));
-                    }
+                      // 🔹 If approved, update "allot" field to currentUserId
+                      if (isApproved && doc['allot'] != currentUserId) {
+                        FirebaseFirestore.instance
+                            .collection('hardwares')
+                            .doc(doc.id)
+                            .update({"allot": currentUserId}).catchError(
+                                (error) => print("Failed to update: $error"));
+                      }
 
-                    return GestureDetector(
-                      onTap: () => _showDetailsDialog(context, doc),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(30), // Curved border
-                          border: Border.all(
-                            color: Colors.grey, // Border color
-                            width: 0.3, // Border width
+                      // 🔹 If the current user is allotted, show "Approved" badge
+                      bool showApprovedBadge = allotUserId == currentUserId;
+                      // 🔹 If the current user is NOT allotted, show "Unavailable" badge
+                      bool showUnavailableBadge =
+                          allotUserId != currentUserId && isLent;
+
+                      return GestureDetector(
+                        onTap: () => _showDetailsDialog(context, doc),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.circular(30), // Curved border
+                            border: Border.all(
+                              color: Colors.grey, // Border color
+                              width: 0.3, // Border width
+                            ),
+                            color: isLent ? Colors.grey[300] : Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black
+                                    .withOpacity(0.1), // Shadow color
+                                blurRadius: 2, // Blur radius
+                                spreadRadius: 1, // Spread radius
+                                offset: Offset(0, 0), // Shadow offset (x, y)
+                              ),
+                            ], // Background color
                           ),
-                          color: isLent ? Colors.grey[300] : Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color:
-                                  Colors.black.withOpacity(0.1), // Shadow color
-                              blurRadius: 2, // Blur radius
-                              spreadRadius: 1, // Spread radius
-                              offset: Offset(0, 0), // Shadow offset (x, y)
-                            ),
-                          ], // Background color
-                        ),
-                        child: Stack(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                        30), // Adds rounded corners
-                                    child: ColorFiltered(
-                                      colorFilter: isLent
-                                          ? ColorFilter.mode(
-                                              Colors.grey, BlendMode.saturation)
-                                          : ColorFilter.mode(Colors.transparent,
-                                              BlendMode.multiply),
-                                      child: Image.asset(
-                                        imagePath,
-                                        fit: BoxFit.cover,
+                          child: Stack(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                          30), // Adds rounded corners
+                                      child: ColorFiltered(
+                                        colorFilter: isLent
+                                            ? ColorFilter.mode(Colors.grey,
+                                                BlendMode.saturation)
+                                            : ColorFilter.mode(
+                                                Colors.transparent,
+                                                BlendMode.multiply),
+                                        child: Image.asset(
+                                          hardwareImages[doc['Title']] ??
+                                              "assets/default.png",
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    doc['Title'],
-                                    style: TextStyle(
-                                      color: const Color.fromARGB(255, 0, 0, 0),
-                                      fontFamily: 'Gilroy',
-                                      fontWeight: FontWeight.w400,
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      doc['Title'],
+                                      style: TextStyle(
+                                        color:
+                                            const Color.fromARGB(255, 0, 0, 0),
+                                        fontFamily: 'Gilroy',
+                                        fontWeight: FontWeight.w400,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                if (isCurrentUser)
-                                  Column(
-                                    children: [
-                                      LinearProgressIndicator(
-                                        value: isApproved
-                                            ? 1.0
-                                            : 0.5, // Progress value
-                                        backgroundColor: Colors.grey[300],
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
+                                  if (isCurrentUser)
+                                    Column(
+                                      children: [
+                                        LinearProgressIndicator(
+                                          value: isApproved
+                                              ? 1.0
+                                              : (isPending
+                                                  ? 0.5
+                                                  : 0.0), // Progress value
+                                          backgroundColor: Colors.grey[300],
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                            isApproved
+                                                ? Color.fromARGB(
+                                                    255, 37, 232, 154)
+                                                : Colors.orange,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
                                           isApproved
-                                              ? Colors.green
-                                              : Colors.orange,
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        isApproved
-                                            ? "Approved"
-                                            : "Pending Approval",
-                                        style: TextStyle(
-                                          color: isApproved
-                                              ? Colors.green
-                                              : Colors.orange,
-                                          fontFamily: 'Gilroy',
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
-                            ),
-                            if (isLent)
-                              Center(
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  child: Text(
-                                    "Unavailable",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontFamily: 'Gilroy',
-                                      shadows: [
-                                        Shadow(
-                                          offset:
-                                              Offset(0, 0), // Shadow position
-                                          blurRadius: 25, // Shadow blur effect
-                                          color: Colors.black
-                                              .withOpacity(0.7), // Shadow color
+                                              ? "Approved"
+                                              : (isPending
+                                                  ? "Pending Approval"
+                                                  : ""),
+                                          style: TextStyle(
+                                            color: isApproved
+                                                ? Color.fromARGB(
+                                                    255, 37, 232, 154)
+                                                : Colors.orange,
+                                            fontFamily: 'Gilroy',
+                                            fontSize: 12,
+                                          ),
                                         ),
                                       ],
-                                      fontWeight: FontWeight.bold,
+                                    ),
+                                ],
+                              ),
+                              if (showApprovedBadge)
+                                Center(
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 5),
+                                    child: Text(
+                                      "Approved",
+                                      style: TextStyle(
+                                        color:
+                                            Color.fromARGB(255, 37, 232, 154),
+                                        fontSize: 20,
+                                        fontFamily: 'Gilroy',
+                                        shadows: [
+                                          Shadow(
+                                            offset:
+                                                Offset(0, 0), // Shadow position
+                                            blurRadius:
+                                                25, // Shadow blur effect
+                                            color: Colors.black.withOpacity(
+                                                0.7), // Shadow color
+                                          ),
+                                        ],
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                          ],
+                              if (showUnavailableBadge)
+                                Center(
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 5),
+                                    child: Text(
+                                      "Unavailable",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontFamily: 'Gilroy',
+                                        shadows: [
+                                          Shadow(
+                                            offset:
+                                                Offset(0, 0), // Shadow position
+                                            blurRadius:
+                                                25, // Shadow blur effect
+                                            color: Colors.black.withOpacity(
+                                                0.7), // Shadow color
+                                          ),
+                                        ],
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                );
-              },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ),
         ],
